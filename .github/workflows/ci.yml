@@ -24,6 +24,7 @@ jobs:
       - name: Extract metadata
         id: meta
         run: |
+          echo "SHORT_SHA=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
           echo "VERSION=$(git describe --always --tags)" >> "$GITHUB_OUTPUT"
           echo "GO_VERSION=$(grep '^go ' go.mod | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
 
@@ -39,7 +40,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:master-${{ github.sha }}
+          tags: ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.SHORT_SHA }}
           build-args: |
             BUILD_IMAGE=docker.io/library/golang:${{ steps.meta.outputs.GO_VERSION }}-bookworm
             RUNTIME_IMAGE=gcr.io/distroless/static:nonroot
